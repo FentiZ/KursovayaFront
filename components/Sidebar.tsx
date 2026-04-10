@@ -1,4 +1,4 @@
-export default function Sidebar({ setPage, page, isOpen }: any) {
+export default function Sidebar({ setPage, page, isOpen, role }: any) {
   return (
     <aside className={`sidebar ${isOpen ? "" : "closed"}`}>
       <h2 className="logo">KASium</h2>
@@ -32,12 +32,15 @@ export default function Sidebar({ setPage, page, isOpen }: any) {
           👤 Профіль
         </button>
 
-        <button
-          className={page === "admin" ? "active" : ""}
-          onClick={() => setPage("admin")}
-        >
-          ⚙️ Адмін
-        </button>
+        {/* ТОЛЬКО ДЛЯ АДМИНА */}
+        {role === "Admin" && (
+          <button
+            className={page === "admin" ? "active" : ""}
+            onClick={() => setPage("admin")}
+          >
+            ⚙️ Адмін
+          </button>
+        )}
       </nav>
     </aside>
   );

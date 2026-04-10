@@ -229,3 +229,24 @@ body {
   background: #9333ea;
   transform: scale(1.05);
 }
+
+body.dark {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: white;
+}
+
+body.light {
+  --bg: #f1f5f9;
+  --card: white;
+  --text: #111;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.card {
+  background: var(--card);
+}

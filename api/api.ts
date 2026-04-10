@@ -184,3 +184,20 @@ export async function deleteUser(id: number) {
     throw new Error("Ошибка удаления пользователя");
   }
 }
+
+
+// =======================
+// Users
+// =======================
+
+export async function updateNickname(nickname: string) {
+  const res = await fetch(`${API_URL}/user/nickname`, {
+    method: "PUT",
+    headers: getHeaders(),
+    body: JSON.stringify({ nickname })
+  });
+
+  if (!res.ok) throw new Error("Ошибка обновления");
+
+  return res.json();
+}
