@@ -1,14 +1,3 @@
-import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  PointElement
-} from "chart.js";
-
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
-
 const GradeChart = ({ grades }: any) => {
   const data = {
     labels: grades.map((g: any) => g.subjectName),
@@ -16,11 +5,29 @@ const GradeChart = ({ grades }: any) => {
       {
         label: "Оцінки",
         data: grades.map((g: any) => g.value),
+        tension: 0.4,
+        fill: true,
       },
     ],
   };
 
-  return <Line data={data} />;
-};
+  const options = {
+    plugins: {
+      legend: {
+        labels: {
+          color: "#e2e8f0"
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: "#94a3b8" }
+      },
+      y: {
+        ticks: { color: "#94a3b8" }
+      }
+    }
+  };
 
-export default GradeChart;
+  return <Line data={data} options={options} />;
+};

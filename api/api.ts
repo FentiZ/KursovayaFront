@@ -1,19 +1,34 @@
 const API_URL = "https://localhost:44332/api";
 
+// =======================
+// HEADERS
+// =======================
 function getHeaders() {
   const token = localStorage.getItem("token");
 
-  if (!token) {
-    console.warn("Нет токена");
-  }
-
   return {
     "Content-Type": "application/json",
-    Authorization: token ? `Bearer ${token}` : ""
+    ...(token ? { Authorization: `Bearer ${token}` } : {})
   };
 }
 
-// ===== LOGIN =====
+// =======================
+// SAFE JSON PARSER
+// =======================
+async function safeJson(res: Response) {
+  const text = await res.text();
+
+  try {
+    return text ? JSON.parse(text) : null;
+  } catch (e) {
+    console.error("Invalid JSON from server:", text);
+    return null;
+  }
+}
+
+// =======================
+// LOGIN
+// =======================
 export async function login(login: string, password: string) {
   const res = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
@@ -23,24 +38,35 @@ export async function login(login: string, password: string) {
     body: JSON.stringify({ login, password })
   });
 
-  const data = await res.json();
+  const data = await safeJson(res);
 
   if (!res.ok) {
-    throw new Error(data);
+    throw new Error(data?.message || "Login error");
   }
 
-  localStorage.setItem("token", data.token);
+  if (data?.token) {
+    localStorage.setItem("token", data.token);
+  }
 
   return data;
 }
 
-// ===== COURSES =====
+// =======================
+// COURSES
+// =======================
 export async function getCourses() {
   const res = await fetch(`${API_URL}/courses/my`, {
     headers: getHeaders()
   });
 
-  return res.json();
+  const data = await safeJson(res);
+
+  if (!res.ok) {
+    console.error("getCourses error:", data);
+    throw new Error("Failed to load courses");
+  }
+
+  return Array.isArray(data) ? data : data?.data ?? [];
 }
 
 export async function createCourse(course: any) {
@@ -50,67 +76,102 @@ export async function createCourse(course: any) {
     body: JSON.stringify(course)
   });
 
-  const text = await res.text();
-  console.log("CREATE COURSE RESPONSE:", text); // 🔥
+  const data = await safeJson(res);
+
+  console.log("CREATE COURSE RESPONSE:", data);
 
   if (!res.ok) {
-    throw new Error(text);
+    throw new Error(data?.message || "Create course error");
   }
 
-  return text ? JSON.parse(text) : null;
+  return data;
 }
 
-export const getClasses = async () => {
+// =======================
+// CLASSES
+// =======================
+export async function getClasses() {
   const res = await fetch(`${API_URL}/classes`, {
     headers: getHeaders()
   });
 
-if (!res.ok) {
-    throw new Error(`HTTP ${res.status}`);
-  }
-  
-  return res.json();
-};
+  const data = await safeJson(res);
 
-export const getSubjects = async () => {
+  if (!res.ok) {
+    console.error("getClasses error:", data);
+    throw new Error("Failed to load classes");
+  }
+
+  return Array.isArray(data) ? data : data?.data ?? [];
+}
+
+export async function createClass(data: any) {
+  const res = await fetch(`${API_URL}/classes`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(data)
+  });
+
+  const result = await safeJson(res);
+
+  if (!res.ok) {
+    throw new Error(result?.message || await res.text());
+  }
+
+  return result;
+}
+
+// =======================
+// SUBJECTS
+// =======================
+export async function getSubjects() {
   const res = await fetch(`${API_URL}/subjects`, {
     headers: getHeaders()
   });
 
-  if (!res.ok) throw new Error(await res.text());
+  const data = await safeJson(res);
 
-  return res.status === 204 ? [] : res.json();
-};
+  if (!res.ok) {
+    console.error("getSubjects error:", data);
+    throw new Error("Failed to load subjects");
+  }
 
+  return Array.isArray(data) ? data : data?.data ?? [];
+}
 
-
- // ===== ADMIN =====
-  export async function createUser(data: any) {
+// =======================
+// ADMIN
+// =======================
+export async function createUser(data: any) {
   const res = await fetch(`${API_URL}/admin/create-user`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify(data)
   });
 
-  const text = await res.text();
-  console.log("SERVER RESPONSE:", text);
+  const result = await safeJson(res);
+
+  console.log("SERVER RESPONSE:", result);
 
   if (!res.ok) {
-    throw new Error(text);
+    throw new Error(result?.message || "Create user error");
   }
 
-  return JSON.parse(text);
+  return result;
 }
+
 export async function getUsers() {
   const res = await fetch(`${API_URL}/admin/users`, {
     headers: getHeaders()
   });
 
+  const data = await safeJson(res);
+
   if (!res.ok) {
-    throw new Error(`HTTP ${res.status}`);
+    throw new Error("Failed to load users");
   }
 
-  return res.json();
+  return Array.isArray(data) ? data : data?.data ?? [];
 }
 
 export async function deleteUser(id: number) {
@@ -119,16 +180,7 @@ export async function deleteUser(id: number) {
     headers: getHeaders()
   });
 
-  if (!res.ok) throw new Error("Ошибка удаления");
+  if (!res.ok) {
+    throw new Error("Ошибка удаления пользователя");
+  }
 }
-
-export const createClass = async (data: any) => {
-  const res = await fetch(`${API_URL}/classes`, {
-    headers: getHeaders(),
-    method: "POST",
-    body: JSON.stringify(data)
-  });
-
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-};

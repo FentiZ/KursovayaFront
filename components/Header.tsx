@@ -1,10 +1,12 @@
-export default function Header({ onLogout, onTheme }: any) {
+export default function Header({ onLogout, onToggleSidebar, nickname }: any) {
   return (
     <header className="header">
-      <h1>Dashboard</h1>
+      <button className="burger" onClick={onToggleSidebar}>
+        ☰
+      </button>
 
-      <div>
-        <button onClick={onTheme}>🌗</button>
+      <div className="header-right">
+        <span>👋 {nickname}</span>
         <button onClick={onLogout}>Вийти</button>
       </div>
     </header>

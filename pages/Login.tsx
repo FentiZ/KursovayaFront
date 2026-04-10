@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+
 export default function Login({ onLogin }: any) {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
@@ -24,12 +25,22 @@ export default function Login({ onLogin }: any) {
 
   return (
     <div className="login">
-      <h2>Вхід</h2>
+      <div className="login-card">
+        <h2>Вхід</h2>
 
-      <input placeholder="Login" onChange={(e) => setLogin(e.target.value)} />
-      <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+        <input
+          placeholder="Login"
+          onChange={(e) => setLogin(e.target.value)}
+        />
 
-      <button onClick={handleLogin}>Login</button>
+        <input
+          type="password"
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button onClick={handleLogin}>Увійти</button>
+      </div>
     </div>
   );
 }

@@ -42,9 +42,9 @@ export default function Courses() {
       setLoading(true);
 
       const [coursesData, classesData, subjectsData] = await Promise.all([
-        api.getCourses(),     // 👉 /api/courses/my
-        api.getClasses(),     // 👉 /api/classes
-        api.getSubjects()     // 👉 /api/subjects
+        api.getCourses(),
+        api.getClasses(),
+        api.getSubjects()
       ]);
 
       setCourses(coursesData);
@@ -64,18 +64,26 @@ export default function Courses() {
         return;
       }
 
-      await api.createCourse({
-        classId: form.classId,
-        subjectId: form.subjectId,
-        isLK: form.isLK
-      });
+      await api.createCourse(form);
 
       setShowModal(false);
+      setForm({ classId: 0, subjectId: 0, isLK: false });
+
       loadAll();
     } catch (err) {
       console.error("Ошибка создания курса", err);
       alert("Ошибка создания курса");
     }
+  };
+
+  // Генерация названия (preview)
+  const getPreviewName = () => {
+    const cls = classes.find(c => c.id === form.classId);
+    const subj = subjects.find(s => s.id === form.subjectId);
+
+    const year = new Date().getFullYear();
+
+    return `${year} ${cls?.name || ""} • ${subj?.name || ""}`;
   };
 
   return (
@@ -92,8 +100,14 @@ export default function Courses() {
           <div className="card" style={{ maxWidth: 400 }}>
             <h3>Создать курс</h3>
 
+            {/* PREVIEW */}
+            <div style={{ marginBottom: 10, fontWeight: "bold" }}>
+              {getPreviewName()}
+            </div>
+
             {/* CLASS */}
             <select
+              value={form.classId}
               onChange={e => setForm({ ...form, classId: Number(e.target.value) })}
             >
               <option value={0}>Выбери класс</option>
@@ -106,6 +120,7 @@ export default function Courses() {
 
             {/* SUBJECT */}
             <select
+              value={form.subjectId}
               onChange={e => setForm({ ...form, subjectId: Number(e.target.value) })}
             >
               <option value={0}>Выбери предмет</option>
@@ -117,13 +132,13 @@ export default function Courses() {
             </select>
 
             {/* LK */}
-            <label style={{ display: "flex", gap: 10 }}>
+            <label style={{ display: "flex", gap: 10, marginTop: 10 }}>
               <input
                 type="checkbox"
                 checked={form.isLK}
                 onChange={e => setForm({ ...form, isLK: e.target.checked })}
               />
-              Leistungskurs (углублённый)
+              Leistungskurs
             </label>
 
             <div style={{ display: "flex", gap: 10, marginTop: 15 }}>
@@ -143,11 +158,11 @@ export default function Courses() {
         <div className="grid">
           {courses.map(c => (
             <div className="card" key={c.id}>
-              <h3>{c.subject?.name || "Без предмета"}</h3>
+              <h3>{c.subject?.name}</h3>
 
               <p><b>Класс:</b> {c.class?.name}</p>
               <p><b>Учитель:</b> {c.teacher?.nickname}</p>
-              <p><b>Тип:</b> {c.isLK ? "Поглиблений" : "Обычный"}</p>
+              <p><b>Тип:</b> {c.isLK ? "LK" : "Обычный"}</p>
             </div>
           ))}
         </div>
