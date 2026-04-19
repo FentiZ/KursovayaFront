@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Chat() {
+export default function Chat({ t }: any) {
   const [messages, setMessages] = useState<string[]>([]);
   const [text, setText] = useState("");
 
@@ -22,7 +22,7 @@ export default function Chat() {
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Написать сообщение..."
+          placeholder={t.messagePlaceholder}
         />
         <button onClick={send}>➤</button>
       </div>

@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-
-export default function Login({ onLogin }: any) {
+export default function Login({ onLogin, t }: any) {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
 
@@ -15,7 +14,7 @@ export default function Login({ onLogin }: any) {
     });
 
     if (!res.ok) {
-      alert("Ошибка");
+      alert(t.error);
       return;
     }
 
@@ -26,20 +25,20 @@ export default function Login({ onLogin }: any) {
   return (
     <div className="login">
       <div className="login-card">
-        <h2>Вхід</h2>
+        <h2>{t.signIn}</h2>
 
         <input
-          placeholder="Login"
+          placeholder={t.login}
           onChange={(e) => setLogin(e.target.value)}
         />
 
         <input
           type="password"
-          placeholder="Password"
+          placeholder={t.password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button onClick={handleLogin}>Увійти</button>
+        <button onClick={handleLogin}>{t.signIn}</button>
       </div>
     </div>
   );

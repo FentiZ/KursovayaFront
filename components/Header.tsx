@@ -3,7 +3,10 @@ export default function Header({
   onToggleSidebar,
   nickname,
   theme,
-  setTheme
+  setTheme,
+  lang,
+  setLang,
+  t
 }: any) {
   return (
     <header className="header">
@@ -12,14 +15,26 @@ export default function Header({
       </button>
 
       <div className="header-right">
-        <span>👋 {nickname}</span>
+        <span>👋 {t.welcome}, {nickname}</span>
 
-        {/* Переключатель темы */}
+        {/* LANGUAGE */}
+        <select
+          value={lang}
+          onChange={(e) => setLang(e.target.value as any)}
+        >
+          <option value="ua">UA</option>
+          <option value="en">EN</option>
+          <option value="de">DE</option>
+        </select>
+
+        {/* THEME */}
         <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
           {theme === "dark" ? "☀️" : "🌙"}
         </button>
 
-        <button onClick={onLogout}>Вийти</button>
+        <button onClick={onLogout}>
+          {t.logout}
+        </button>
       </div>
     </header>
   );

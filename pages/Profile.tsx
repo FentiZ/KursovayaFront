@@ -33,7 +33,7 @@ export default function Profile({ user, setUser }: any) {
   };
 
   // =========================
-  // Обновление темы
+  // Обновление темы (W.I.P)
   // =========================
   const updateTheme = async (newTheme: string) => {
     try {

@@ -66,7 +66,7 @@ export async function getCourses() {
     throw new Error("Failed to load courses");
   }
 
-  return Array.isArray(data) ? data : data?.data ?? [];
+  return Array.isArray(data) ? data : [];
 }
 
 export async function createCourse(course: any) {
@@ -200,4 +200,15 @@ export async function updateNickname(nickname: string) {
   if (!res.ok) throw new Error("Ошибка обновления");
 
   return res.json();
+}
+
+export async function deleteClass(id: number) {
+  const res = await fetch(`${API_URL}/classes/${id}`, {
+    method: "DELETE",
+    headers: getHeaders()
+  });
+
+  if (!res.ok) {
+    throw new Error("Delete class error");
+  }
 }

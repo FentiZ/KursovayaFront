@@ -1,28 +1,10 @@
 import { useEffect, useState } from "react";
 import * as api from "../api/api";
 
-type Course = {
-  id: number;
-  subject?: { name: string };
-  class?: { name: string };
-  teacher?: { nickname: string };
-  isLK: boolean;
-};
-
-type Class = {
-  id: number;
-  name: string;
-};
-
-type Subject = {
-  id: number;
-  name: string;
-};
-
-export default function Courses() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [classes, setClasses] = useState<Class[]>([]);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+export default function Courses({ t }: any) {
+  const [courses, setCourses] = useState<any[]>([]);
+  const [classes, setClasses] = useState<any[]>([]);
+  const [subjects, setSubjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [showModal, setShowModal] = useState(false);
@@ -38,131 +20,110 @@ export default function Courses() {
   }, []);
 
   const loadAll = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const [coursesData, classesData, subjectsData] = await Promise.all([
-        api.getCourses(),
-        api.getClasses(),
-        api.getSubjects()
-      ]);
+    const [coursesData, classesData, subjectsData] = await Promise.all([
+      api.getCourses(),
+      api.getClasses(),
+      api.getSubjects()
+    ]);
 
-      setCourses(coursesData);
-      setClasses(classesData);
-      setSubjects(subjectsData);
-    } catch (err) {
-      console.error("Ошибка загрузки", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setCourses(coursesData || []);
+    setClasses(classesData || []);
+    setSubjects(subjectsData || []);
+  } catch (err) {
+    console.error("LOAD ERROR:", err);
+    setCourses([]); // не даём упасть
+  } finally {
+    setLoading(false);
+  }
+};
 
   const createCourse = async () => {
+    if (!form.classId || !form.subjectId) {
+      alert("Select class and subject");
+    return;
+}
+
     try {
-      if (!form.classId || !form.subjectId) {
-        alert("Выбери класс и предмет");
-        return;
-      }
-
       await api.createCourse(form);
+        } catch (err) {
+          console.error(err);
+          alert("Create error");
+        }
 
-      setShowModal(false);
-      setForm({ classId: 0, subjectId: 0, isLK: false });
+    setForm({
+      classId: 0,
+      subjectId: 0,
+      isLK: false
+    });
 
-      loadAll();
-    } catch (err) {
-      console.error("Ошибка создания курса", err);
-      alert("Ошибка создания курса");
-    }
-  };
-
-  // Генерация названия (preview)
-  const getPreviewName = () => {
-    const cls = classes.find(c => c.id === form.classId);
-    const subj = subjects.find(s => s.id === form.subjectId);
-
-    const year = new Date().getFullYear();
-
-    return `${year} ${cls?.name || ""} • ${subj?.name || ""}`;
+    setShowModal(false);
+    loadAll();
   };
 
   return (
     <div>
-      {/* HEADER */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-        <h2>📚 Курсы</h2>
-        <button onClick={() => setShowModal(true)}>+ Создать курс</button>
+        <h2>📚 {t.courses}</h2>
+        <button onClick={() => setShowModal(true)}>+ {t.createCourse}</button>
       </div>
 
-      {/* MODAL */}
       {showModal && (
         <div className="modal">
           <div className="card" style={{ maxWidth: 400 }}>
-            <h3>Создать курс</h3>
+            <h3>{t.createCourse}</h3>
 
-            {/* PREVIEW */}
-            <div style={{ marginBottom: 10, fontWeight: "bold" }}>
-              {getPreviewName()}
-            </div>
-
-            {/* CLASS */}
             <select
-              value={form.classId}
               onChange={e => setForm({ ...form, classId: Number(e.target.value) })}
             >
-              <option value={0}>Выбери класс</option>
+              <option value={0}>{t.selectClass}</option>
               {classes.map(c => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
+                <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
 
-            {/* SUBJECT */}
             <select
-              value={form.subjectId}
               onChange={e => setForm({ ...form, subjectId: Number(e.target.value) })}
             >
-              <option value={0}>Выбери предмет</option>
+              <option value={0}>{t.selectSubject}</option>
               {subjects.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
+                <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
 
-            {/* LK */}
-            <label style={{ display: "flex", gap: 10, marginTop: 10 }}>
-              <input
-                type="checkbox"
-                checked={form.isLK}
-                onChange={e => setForm({ ...form, isLK: e.target.checked })}
-              />
-              Leistungskurs
-            </label>
+            <div style={{ marginTop: 10 }}>
+              <label>
+                <input
+                  type="checkbox"
+                  onChange={e => setForm({ ...form, isLK: e.target.checked })}
+                />
+                Leistungskurs
+              </label>
+            </div>
 
             <div style={{ display: "flex", gap: 10, marginTop: 15 }}>
-              <button onClick={createCourse}>Создать</button>
-              <button onClick={() => setShowModal(false)}>Отмена</button>
+              <button onClick={createCourse}>{t.create}</button>
+              <button onClick={() => setShowModal(false)}>{t.cancel}</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* CONTENT */}
       {loading ? (
-        <p>Загрузка...</p>
+        <p>{t.loading}</p>
       ) : courses.length === 0 ? (
-        <p>Нет курсов</p>
+        <p>{t.noCourses}</p>
       ) : (
         <div className="grid">
           {courses.map(c => (
             <div className="card" key={c.id}>
               <h3>{c.subject?.name}</h3>
 
-              <p><b>Класс:</b> {c.class?.name}</p>
-              <p><b>Учитель:</b> {c.teacher?.nickname}</p>
-              <p><b>Тип:</b> {c.isLK ? "LK" : "Обычный"}</p>
+              <p><b>{t.class}:</b> {c.class?.name}</p>
+              <p><b>{t.teacher}:</b> {c.teacher?.nickname}</p>
+              <p><b>{t.type}:</b> {c.isLK ? "LK" : t.normal}</p>
             </div>
           ))}
         </div>

@@ -1,29 +1,64 @@
 /* RESET */
 * {
   box-sizing: border-box;
-}
-
-body {
   margin: 0;
-  font-family: "Inter", sans-serif;
-  background: #0f172a;
+  padding: 0;
 }
 
-/* APP */
+/* ===================== */
+/* 🎨 THEME VARIABLES */
+/* ===================== */
+
+:root {
+  --accent: #8b5cf6;
+  --accent-hover: #7c3aed;
+}
+
+/* DARK */
+body.dark {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --card-soft: #020617;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+}
+
+/* LIGHT */
+body.light {
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --card-soft: #e2e8f0;
+  --text: #0f172a;
+  --text-muted: #64748b;
+}
+
+/* BASE */
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ===================== */
+/* APP LAYOUT */
+/* ===================== */
+
 .app {
   display: flex;
   height: 100vh;
-  color: #e2e8f0;
 }
 
+/* ===================== */
 /* SIDEBAR */
+/* ===================== */
+
 .sidebar {
   position: fixed;
   left: 0;
   top: 0;
   height: 100%;
   width: 240px;
-  background: #020617;
+  background: var(--card-soft);
   padding: 20px;
   transition: 0.3s;
   z-index: 1000;
@@ -34,7 +69,7 @@ body {
 }
 
 .sidebar h2 {
-  color: #a855f7;
+  color: var(--accent);
   margin-bottom: 30px;
 }
 
@@ -44,27 +79,46 @@ body {
   align-items: center;
   gap: 10px;
   width: 100%;
-  margin-bottom: 10px;
-  padding: 12px;
+  margin-bottom: 8px;
+  padding: 12px 14px;
+
   border: none;
-  background: transparent;
-  color: #94a3b8;
   border-radius: 12px;
+
+  background: transparent;
+  color: var(--text-muted);
+
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.25s ease;
+  position: relative;
 }
 
 .sidebar button:hover {
-  background: #1e293b;
-  color: white;
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--text);
+  transform: translateX(5px);
 }
 
 .sidebar .active {
-  background: #1e293b;
+  background: linear-gradient(90deg, var(--accent), transparent);
   color: white;
 }
 
+.sidebar .active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20%;
+  height: 60%;
+  width: 4px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* ===================== */
 /* MAIN */
+/* ===================== */
+
 .main {
   flex: 1;
   margin-left: 240px;
@@ -77,23 +131,26 @@ body {
   margin-left: 0;
 }
 
+/* ===================== */
 /* HEADER */
+/* ===================== */
+
 .header {
   height: 60px;
-  background: #020617;
+  background: var(--card-soft);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid var(--card);
 }
 
 /* BURGER */
 .burger {
   font-size: 22px;
-  background: #1e293b;
+  background: var(--card);
   border: none;
-  color: white;
+  color: var(--text);
   cursor: pointer;
   border-radius: 10px;
   padding: 8px 12px;
@@ -101,40 +158,75 @@ body {
 }
 
 .burger:hover {
-  background: #334155;
+  background: var(--card-soft);
 }
 
-/* USER */
+/* HEADER RIGHT */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* HEADER BUTTONS + SELECT */
+.header button,
+.header select {
+  background: var(--card);
+  border: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  color: var(--text);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.header button:hover,
+.header select:hover {
+  background: var(--card-soft);
+}
+
+/* USER TEXT */
 .user {
   font-weight: 500;
   opacity: 0.8;
 }
 
+/* ===================== */
 /* CONTENT */
+/* ===================== */
+
 .content {
   flex: 1;
   padding: 25px;
   overflow-y: auto;
 }
 
+/* ===================== */
 /* GRID */
+/* ===================== */
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
 }
 
+/* ===================== */
 /* CARD */
+/* ===================== */
+
 .card {
-  background: #020617;
+  background: var(--card);
   padding: 20px;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  transition: 0.2s;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+  transition: 0.25s;
 }
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-5px) scale(1.01);
 }
 
 .card.wide {
@@ -148,105 +240,135 @@ body {
   margin-top: 10px;
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
-  .main {
-    margin-left: 0;
-  }
+/* ===================== */
+/* BUTTONS */
+/* ===================== */
+
+.btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.header-right {
+.btn.primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn.primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn.danger {
+  background: #ef4444;
+  color: white;
+}
+
+.btn.danger:hover {
+  background: #dc2626;
+}
+
+/* ===================== */
+/* FORM */
+/* ===================== */
+
+.form-row {
   display: flex;
-  align-items: center;
-  gap: 15px;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 
-.footer {
-  height: 40px;
-  background: #020617;
+.form-row input,
+.form-row select {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: var(--card-soft);
+  color: var(--text);
+}
+
+/* ===================== */
+/* LIST */
+/* ===================== */
+
+.class-list {
+  margin-top: 10px;
+}
+
+.class-item {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  border-top: 1px solid #1e293b;
+  background: var(--card-soft);
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 8px;
 }
 
-/* LOGIN PAGE */
+/* ===================== */
+/* LOGIN */
+/* ===================== */
+
 .login {
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #020617, #0f172a);
+  background: linear-gradient(135deg, var(--card-soft), var(--bg));
 }
 
-/* LOGIN CARD */
 .login-card {
-  background: #020617;
+  background: var(--card);
   padding: 40px;
   border-radius: 20px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
   display: flex;
   flex-direction: column;
   gap: 15px;
   width: 320px;
 }
 
-/* TITLE */
 .login-card h2 {
-  margin: 0;
   text-align: center;
-  color: #a855f7;
+  color: var(--accent);
 }
 
-/* INPUTS */
 .login-card input {
   padding: 12px;
   border-radius: 10px;
   border: none;
-  background: #1e293b;
-  color: white;
-  outline: none;
-  transition: 0.2s;
+  background: var(--card-soft);
+  color: var(--text);
 }
 
 .login-card input:focus {
-  background: #334155;
+  outline: 2px solid var(--accent);
 }
 
-/* BUTTON */
 .login-card button {
   padding: 12px;
   border: none;
   border-radius: 10px;
-  background: #a855f7;
+  background: var(--accent);
   color: white;
   cursor: pointer;
-  font-weight: 500;
   transition: 0.2s;
 }
 
 .login-card button:hover {
-  background: #9333ea;
+  background: var(--accent-hover);
   transform: scale(1.05);
 }
 
-body.dark {
-  --bg: #0f172a;
-  --card: #1e293b;
-  --text: white;
-}
+/* ===================== */
+/* MOBILE */
+/* ===================== */
 
-body.light {
-  --bg: #f1f5f9;
-  --card: white;
-  --text: #111;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-}
-
-.card {
-  background: var(--card);
+@media (max-width: 768px) {
+  .main {
+    margin-left: 0;
+  }
 }

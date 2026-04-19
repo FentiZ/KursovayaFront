@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import * as api from "../api/api";
+import translations from "../translations";
 
-export default function AdminPanel() {
+export default function AdminPanel({ lang }: any) {
+  const t = translations[lang];
+
   const [users, setUsers] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
 
-  // USER FORM
   const [form, setForm] = useState({
     login: "",
     password: "",
@@ -14,9 +16,8 @@ export default function AdminPanel() {
     age: 18
   });
 
-  // CLASS FORM
   const [newClass, setNewClass] = useState({
-    type: "normal", // normal | EF | Q1 | Q2
+    type: "normal",
     grade: "10",
     letter: "A"
   });
@@ -26,160 +27,135 @@ export default function AdminPanel() {
     loadClasses();
   }, []);
 
-  // ================= USERS =================
-
   const loadUsers = async () => {
-    try {
-      const data = await api.getUsers();
-      setUsers(data);
-    } catch (e) {
-      console.error(e);
-    }
+    const data = await api.getUsers();
+    setUsers(data);
   };
 
   const handleCreate = async () => {
-    try {
-      await api.createUser(form);
-      loadUsers();
-      alert("Пользователь создан");
-    } catch {
-      alert("Ошибка");
-    }
+    await api.createUser(form);
+    loadUsers();
   };
 
   const handleDelete = async (id: number) => {
-    try {
-      await api.deleteUser(id);
-      loadUsers();
-    } catch {
-      alert("Ошибка удаления");
-    }
+    await api.deleteUser(id);
+    loadUsers();
   };
 
-  // ================= CLASSES =================
-
   const loadClasses = async () => {
-    try {
-      const data = await api.getClasses();
-      setClasses(data);
-    } catch (e) {
-      console.error(e);
-    }
+    const data = await api.getClasses();
+    setClasses(data);
   };
 
   const createClass = async () => {
-    try {
-      let name = "";
+    let name = "";
 
-      if (newClass.type === "normal") {
-        name = `${newClass.grade}${newClass.letter}`;
-      } else {
-        name = newClass.type; // EF / Q1 / Q2
-      }
-
-      await api.createClass({ name });
-
-      loadClasses();
-    } catch (e) {
-      console.error(e);
-      alert("Ошибка создания класса");
+    if (newClass.type === "normal") {
+      name = `${newClass.grade}${newClass.letter}`;
+    } else {
+      name = newClass.type;
     }
+
+    await api.createClass({ name });
+    loadClasses();
   };
 
-  // ================= UI =================
+  const deleteClass = async (id: number) => {
+    await api.deleteClass(id);
+    loadClasses();
+  };
 
   return (
     <div className="page">
-      <h1>⚙️ Админ панель</h1>
-
-      {/* ===== USERS ===== */}
-      <div className="card">
-        <h3>Создать пользователя</h3>
-
-        <input placeholder="Login"
-          onChange={e => setForm({ ...form, login: e.target.value })} />
-
-        <input placeholder="Password"
-          type="password"
-          onChange={e => setForm({ ...form, password: e.target.value })} />
-
-        <input placeholder="Nickname"
-          onChange={e => setForm({ ...form, nickname: e.target.value })} />
-
-        <input placeholder="Age"
-          type="number"
-          onChange={e => setForm({ ...form, age: Number(e.target.value) })} />
-
-        <select onChange={e => setForm({ ...form, role: e.target.value })}>
-          <option value="Teacher">Teacher</option>
-          <option value="Student">Student</option>
-          <option value="Admin">Admin</option>
-        </select>
-
-        <button onClick={handleCreate}>➕ Создать</button>
-      </div>
+      <h1>⚙️ {t.admin}</h1>
 
       <div className="card">
-        <h3>👥 Пользователи</h3>
+        <h3>{t.createUser}</h3>
 
-        <div className="table">
-          {users.map(u => (
-            <div className="row" key={u.id}>
-              <div>{u.login}</div>
-              <div>{u.role}</div>
-              <div>{u.age}</div>
+        <div className="form-row">
+          <input placeholder="Login"
+            onChange={e => setForm({ ...form, login: e.target.value })} />
 
-              <button onClick={() => handleDelete(u.id)}>❌</button>
-            </div>
-          ))}
+          <input placeholder="Password" type="password"
+            onChange={e => setForm({ ...form, password: e.target.value })} />
+
+          <input placeholder="Nickname"
+            onChange={e => setForm({ ...form, nickname: e.target.value })} />
+
+          <input placeholder="Age" type="number"
+            onChange={e => setForm({ ...form, age: Number(e.target.value) })} />
+
+          <select onChange={e => setForm({ ...form, role: e.target.value })}>
+            <option value="Teacher">Teacher</option>
+            <option value="Student">Student</option>
+            <option value="Admin">Admin</option>
+          </select>
+
+          <button className="btn primary" onClick={handleCreate}>
+            ➕
+          </button>
         </div>
       </div>
 
-      {/* ===== CLASSES ===== */}
       <div className="card">
-        <h3>🏫 Классы</h3>
+        <h3>👥 {t.users}</h3>
 
-        {/* TYPE */}
-        <select
-          onChange={e => setNewClass({ ...newClass, type: e.target.value })}
-        >
-          <option value="normal">Обычный класс</option>
-          <option value="EF">EF</option>
-          <option value="Q1">Q1</option>
-          <option value="Q2">Q2</option>
-        </select>
-
-        {/* NORMAL CLASS */}
-        {newClass.type === "normal" && (
-          <div style={{ display: "flex", gap: 10 }}>
-            <select
-              onChange={e => setNewClass({ ...newClass, grade: e.target.value })}
-            >
-              {[5,6,7,8,9,10].map(g => (
-                <option key={g} value={g}>{g}</option>
-              ))}
-            </select>
-
-            <select
-              onChange={e => setNewClass({ ...newClass, letter: e.target.value })}
-            >
-              {["A","B","C"].map(l => (
-                <option key={l} value={l}>{l}</option>
-              ))}
-            </select>
+        {users.map(u => (
+          <div className="class-item" key={u.id}>
+            <span>{u.login} ({u.role})</span>
+            <button className="btn danger" onClick={() => handleDelete(u.id)}>
+              ✖
+            </button>
           </div>
-        )}
+        ))}
+      </div>
 
-        <button onClick={createClass}>➕ Создать класс</button>
+      <div className="card">
+        <h3>🏫 {t.classes}</h3>
 
-        {/* LIST */}
-        <div className="table">
-          {classes.map(c => (
-            <div className="row" key={c.id}>
-              <div>{c.name}</div>
-            </div>
-          ))}
+        <div className="form-row">
+          <select
+            onChange={e => setNewClass({ ...newClass, type: e.target.value })}
+          >
+            <option value="normal">Normal</option>
+            <option value="EF">EF</option>
+            <option value="Q1">Q1</option>
+            <option value="Q2">Q2</option>
+          </select>
+
+          {newClass.type === "normal" && (
+            <>
+              <select
+                onChange={e => setNewClass({ ...newClass, grade: e.target.value })}
+              >
+                {[5,6,7,8,9,10].map(g => (
+                  <option key={g}>{g}</option>
+                ))}
+              </select>
+
+              <select
+                onChange={e => setNewClass({ ...newClass, letter: e.target.value })}
+              >
+                {["A","B","C"].map(l => (
+                  <option key={l}>{l}</option>
+                ))}
+              </select>
+            </>
+          )}
+
+          <button className="btn primary" onClick={createClass}>
+            ➕
+          </button>
         </div>
+
+        {classes.map(c => (
+          <div className="class-item" key={c.id}>
+            <span>{c.name}</span>
+            <button className="btn danger" onClick={() => deleteClass(c.id)}>
+              ✖
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
